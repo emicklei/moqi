@@ -16,3 +16,10 @@ func Query(label string, query *mgo.Query) mQuery {
 	}
 	return &delegatingQuery{query}
 }
+
+func C(label string, collection *mgo.Collection) mCollection {
+	if ErrorSimulator.enabled {
+		return ErrorSimulator.NewCollection(label, collection)
+	}
+	return &delegatingCollection{collection}
+}

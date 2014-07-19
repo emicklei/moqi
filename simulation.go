@@ -30,6 +30,19 @@ func (e ErrorSimulation) NewQuery(label string, query *mgo.Query) mQuery {
 	}
 }
 
+func (e ErrorSimulation) NewCollection(label string, collection *mgo.Collection) mCollection {
+	experiment, ok := e.experiments[label]
+	delegator := &delegatingCollection{collection}
+	if !ok {
+		return delegator
+	}
+	return &testingCollection{
+		delegatingCollection: delegator,
+		errorToReturn:        errors.New(experiment.ErrorMessage),
+		once:                 experiment.Once,
+	}
+}
+
 func (e *ErrorSimulation) AddExperiment(label string, message string, once bool) {
 	e.experiments[label] = SimulatedError{
 		Label:        label,
